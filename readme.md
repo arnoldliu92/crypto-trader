@@ -73,60 +73,69 @@ The API documentation will be available at `/swagger-ui.html` after running the 
 
 ## Table Structure
 
-### Users
-| Column    | Type    | Description            |
-|-----------|---------|------------------------|
-| id        | Integer | Primary key            |
-| username  | String  | Unique username        |
-| balance   | Double  | Wallet balance in USDT |
+### User
+| Column     | Type   | Description      |
+|------------|--------|------------------|
+| id         | Long   | Primary key      |
+| full_name  | String | User's Full Name |
+| email      | String | Email Address    |
 
-### Trades
-| Column    | Type      | Description            |
-|-----------|-----------|------------------------|
-| id        | Integer   | Primary key            |
-| user_id   | Integer   | Foreign key to Users   |
-| type      | String    | Trade type (BUY/SELL)  |
-| pair      | String    | Trading pair (ETHUSDT/BTCUSDT) |
-| price     | Double    | Trade price            |
-| amount    | Double    | Amount traded          |
-| timestamp | Timestamp | Trade timestamp        |
+### Wallet
+| Column      | Type    | Description            |
+|-------------|---------|------------------------|
+| id          | Long | Primary key               |
+| user_id     | Long   | Foreign key to Users    |
+| crypto_type | String  | ETHUSDT/BTCUSDT        |
+| balance     | Double  | Wallet balance in USDT |
 
-### Prices
-| Column     | Type    | Description            |
-|------------|---------|------------------------|
-| id         | Long    | Primary key            |
-| pair       | String  | Trading pair (ETHUSDT/BTCUSDT) |
-| bid_price  | Double  | Current bid price      |
-| ask_price  | Double  | Current ask price      |
-| timestamp  | Long    | Timestamp of the price |
+### Trade
+| Column      | Type      | Description                    |
+|-------------|-----------|--------------------------------|
+| id          | Long      | Primary key                    |
+| user_id     | Long      | Foreign key to Users           |
+| trade_type  | String    | Trade type (BUY/SELL)          |
+| crypto_type | String    | Trading pair (ETHUSDT/BTCUSDT) |
+| price       | Double    | Trade price                    |
+| amount      | Double    | Amount traded                  |
+| timestamp   | Timestamp | Trade timestamp                |
+
+### Price
+| Column      | Type      | Description                    |
+|-------------|-----------|--------------------------------|
+| id          | Long      | Primary key                    |
+| source      | String    | Data source (Binance/Huobi)    |
+| crypto_type | String    | Trading pair (ETHUSDT/BTCUSDT) |
+| bid_price   | Double    | Current bid price (SELL)       |
+| ask_price   | Double    | Current ask price (BUY)        |
+| timestamp   | Timestamp | Timestamp of the price         |
 
 ## Scheduler
 Implement a scheduler to fetch and update prices from Binance and Huobi every 10 seconds. Store the best prices (bid for sell orders, ask for buy orders) in the `Prices` table.
 
 ## API Endpoints
 
-### Get Latest Best Price
-- **GET** `/api/price/latest`
+### Get The Latest Best Price
+- **GET** `/api/v1/price/latest`
     - Retrieves the latest best aggregated price.
 
+### Get Wallet Balance
+- **GET** `/api/v1/users/{id}/wallet`
+    - Retrieves the user's cryptocurrency wallet balance.
+
 ### Trade
-- **POST** `/api/trade`
+- **POST** `/api/v1/trade`
     - Allows users to trade based on the latest best aggregated price.
     - Request Body:
       ```json
       {
         "type": "BUY/SELL",
         "pair": "ETHUSDT/BTCUSDT",
-        "amount": <amount>
+        "amount": "<amount>"
       }
       ```
 
-### Get Wallet Balance
-- **GET** `/api/wallet/balance`
-    - Retrieves the user's cryptocurrency wallet balance.
-
 ### Get Trading History
-- **GET** `/api/trade/history`
+- **GET** `/api/v1/trade/history`
     - Retrieves the user's trading history.
 
 ## Contribution Guidelines
