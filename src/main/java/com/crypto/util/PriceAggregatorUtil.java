@@ -4,28 +4,35 @@ import com.crypto.entity.Price;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.CryptoWebsite;
 import com.crypto.enums.DataSource;
-import com.crypto.response.CryptoTickerResponse;
 import com.crypto.response.CryptoNestedTickerResponse;
+import com.crypto.response.CryptoTickerResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class PriceAggregatorUtil {
     private final Logger logger = LoggerFactory.getLogger(PriceAggregatorUtil.class);
 
+    @Autowired
+    private final SqlUtil sqlUtil = new SqlUtil();
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // There are 2 types of Responses from the Crypto websites, kept in array for scalability
-    // eg. NonNested - BINANCE: [{...}, {...}]
-    // eg. Nested - HUOBI: {"data":[{...}, {...}]}
+    /**
+     * There are 2 types of Responses from the Crypto websites, kept in array for scalability
+     * e.g. NonNested - BINANCE: [{...}, {...}]
+     * e.g. Nested - HUOBI: {"data":[{...}, {...}]}
+     * */
     private final Map<String, CryptoWebsite[]> websiteMapping = Map.of(
         "Non Nested", new CryptoWebsite[] { CryptoWebsite.BINANCE },
         "Nested", new CryptoWebsite[] { CryptoWebsite.HUOBI }
@@ -54,7 +61,7 @@ public class PriceAggregatorUtil {
             try {
                 fullListOfCryptoTicker.add(Pair.of(nonNestedResponse.toString(), objectMapper.readValue(response, CryptoTickerResponse[].class)));
             } catch (IOException exception) {
-                throw new RuntimeException("Failed to parse Binance response", exception);
+                logger.error("Failed to parse NonNested response", exception);
             }
         }
         for (CryptoWebsite nestedResponse : nestedResponses) {
@@ -63,7 +70,7 @@ public class PriceAggregatorUtil {
                 CryptoNestedTickerResponse cryptoNestedTickerResponse = objectMapper.readValue(response, CryptoNestedTickerResponse.class);
                 fullListOfCryptoTicker.add(Pair.of(nestedResponse.toString(), cryptoNestedTickerResponse.getCryptoTickerResponses()));
             } catch (IOException exception) {
-                throw new RuntimeException("Failed to parse Huobi response", exception);
+                logger.error("Failed to parse Nested response", exception);
             }
         }
 
@@ -73,10 +80,10 @@ public class PriceAggregatorUtil {
     /**
      * Iterate through the full list of Cryto Ticker response gotten from all the cryto source websites
      *
-     * @param cryptoType Type of crypto interested in finding the best bid or ask price
-     * @param fullList The full list of Cryto Ticker response gotten from all the cryto source websites,
-     *                 the pair also stores the source website as the first element
-     * @return Price[] { bestBidPrice, bestAskPrice }
+     * @param cryptoType    Type of crypto interested in finding the best bid or ask price
+     * @param fullList      The full list of Cryto Ticker response gotten from all the cryto source websites,
+     *                      the pair also stores the source website as the first element
+     * @return              Price[] { bestBidPrice, bestAskPrice }
      */
     private Price[] getBestPriceDetails(List<Pair<String, CryptoTickerResponse[]>> fullList, CryptoType cryptoType) {
         Price bestBidPrice = new Price();
@@ -90,8 +97,8 @@ public class PriceAggregatorUtil {
                 }
             }
         }
-        bestBidPrice.setTimestampCreated(new java.sql.Timestamp(System.currentTimeMillis()));
-        bestAskPrice.setTimestampCreated(new java.sql.Timestamp(System.currentTimeMillis()));
+        bestBidPrice.setTimestampCreated(sqlUtil.createCurrentTimestamp());
+        bestAskPrice.setTimestampCreated(sqlUtil.createCurrentTimestamp());
         return new Price[] { bestBidPrice, bestAskPrice };
     }
 
@@ -102,11 +109,11 @@ public class PriceAggregatorUtil {
      * If newBidPrice < existingBidPrice -> Replace with new
      * If newAskPrice > existingAskPrice -> Replace with new
      *
-     * @param ticker Individual ticker information
-     * @param bestBidPrice Price object used to store the eventual best Bid price
-     * @param bestAskPrice Price object used to store the eventual best Ask price
-     * @param source Website source for which ticker is gotten from
-     * @return Price[] { bestBidPrice, bestAskPrice }
+     * @param ticker        Individual ticker information
+     * @param bestBidPrice  Price object used to store the eventual best Bid price
+     * @param bestAskPrice  Price object used to store the eventual best Ask price
+     * @param source        Website source for which ticker is gotten from
+     * @return              Price[] { bestBidPrice, bestAskPrice }
      */
     private Price[] setPriceDetails(CryptoTickerResponse ticker, Price bestBidPrice, Price bestAskPrice, String source) {
         if (bestBidPrice.getCryptoType() == null) {

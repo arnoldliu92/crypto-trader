@@ -28,7 +28,10 @@ public class PriceService {
 
     public Price getLatestPrice(CryptoType cryptoType) {
         return priceRepository.findLatestPriceByCryptoType(cryptoType)
-                .orElseThrow(() -> new PriceNotFoundException(cryptoType));
+                .orElseThrow(() -> {
+                    logger.error("Unable to get the latest price for {}", cryptoType);
+                    return new PriceNotFoundException(cryptoType);
+                });
     }
 
     @Cacheable("latestBestPrice")
@@ -40,7 +43,7 @@ public class PriceService {
                 Optional<Price> latestBestPrice = priceRepository.findLatestPriceByCryptoType(cryptoType);
                 latestBestPrice.ifPresent(bestPricesList::add);
             } catch (PriceNotFoundException exception) {
-                logger.error(new PriceNotFoundException(cryptoType).getMessage());
+                logger.error("Failed to fetch latest best aggregated price for {}", cryptoType, exception);
             }
         }
         return bestPricesList;
@@ -48,13 +51,13 @@ public class PriceService {
 
     /**
      * Fetch prices from external sources
-     * Update the aggregated best prices to DB
+     * Update the aggregated best bid and ask prices to DB
      * Cache and update DB every 10 seconds
      */
     @CacheEvict(value = "latestBestPrice", allEntries = true)
     public void updatePrices() {
         // Fetch prices from external sources
-        logger.info("Fetching and aggregating prices");
+        logger.debug("Fetching aggregated best prices...");
         List<Price[]> bestPricesList = priceAggregatorUtil.getBestPricesList();
 
         for (Price[] entryByCrypto : bestPricesList) {
@@ -70,6 +73,6 @@ public class PriceService {
     @CacheEvict(value = "latestPrice", key = "#cryptoType")
     private void updateLatestPriceCache(CryptoType cryptoType) {
         // This method is used to evict the cache entry for a specific crypto type
-        logger.info("Evicting cache for crypto type: " + cryptoType);
+        logger.debug("Evicting cache for crypto type: " + cryptoType);
     }
 }

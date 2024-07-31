@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
@@ -14,9 +13,7 @@ import java.sql.Timestamp;
 @Entity
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Trade {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY )
     @Column(name = "trade_id")
@@ -27,10 +24,12 @@ public class Trade {
     private long userId;
 
     @NotNull(message = "Trade Type is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "trade_type")
     private TradeType tradeType;
 
     @NotNull(message = "Crypto Type is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "crypto_type")
     private CryptoType cryptoType;
 
@@ -46,8 +45,12 @@ public class Trade {
     @Column(name = "timestamp_created")
     private Timestamp timestampCreated;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    public Trade(long userId, TradeType tradeType, CryptoType cryptoType, double price, double amount, Timestamp timestampCreated) {
+        this.userId = userId;
+        this.tradeType = tradeType;
+        this.cryptoType = cryptoType;
+        this.price = price;
+        this.amount = amount;
+        this.timestampCreated = timestampCreated;
+    }
 }

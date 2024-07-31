@@ -14,9 +14,7 @@ import java.sql.Timestamp;
 @Entity
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Price {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY )
     @Column(name = "price_id")
@@ -41,5 +39,4 @@ public class Price {
     @CreationTimestamp
     @Column(name = "timestamp")
     private Timestamp timestampCreated;
-
 }

@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -23,7 +23,8 @@ public class User {
     @Column(name = "email", unique = true)
     private String email;
 
-//    @Column(name = "usd_balance")
-//    private double usdBalance;
-
+    public User(String fullName, String email) {
+        this.fullName = fullName;
+        this.email = email;
+    }
 }

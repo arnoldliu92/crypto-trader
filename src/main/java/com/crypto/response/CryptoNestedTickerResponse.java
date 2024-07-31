@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class CryptoNestedTickerResponse {
-    public CryptoTickerResponse[] cryptoTickerResponses;
+    private CryptoTickerResponse[] cryptoTickerResponses;
 }
