@@ -8,6 +8,7 @@ class CryptoTradingApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }

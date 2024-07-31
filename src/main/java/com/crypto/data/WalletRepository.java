@@ -1,6 +1,5 @@
 package com.crypto.data;
 
-import com.crypto.entity.Price;
 import com.crypto.entity.Wallet;
 import com.crypto.enums.CryptoType;
 import org.springframework.data.jpa.repository.JpaRepository;

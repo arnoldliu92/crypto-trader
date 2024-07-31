@@ -8,7 +8,7 @@ public class WalletNotFoundException extends RuntimeException{
     }
 
     public WalletNotFoundException(Long userId, CryptoType cryptoType) {
-        super(String.format("User %l does not have the required %s wallet.", userId, cryptoType.toString()));
+        super(String.format("User %d does not have the required %s wallet.", userId, cryptoType.toString()));
     }
 
 }

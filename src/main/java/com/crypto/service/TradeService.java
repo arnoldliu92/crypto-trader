@@ -5,6 +5,8 @@ import com.crypto.entity.Price;
 import com.crypto.entity.Trade;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.TradeType;
+import com.crypto.exception.InsufficientBalanceException;
+import com.crypto.exception.WalletNotFoundException;
 import com.crypto.util.SqlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Service
 public class TradeService {
+    private static final Logger logger = LoggerFactory.getLogger(TradeService.class);
+
     @Autowired
     private TradeRepository tradeRepository;
     @Autowired
@@ -30,7 +34,7 @@ public class TradeService {
     }
 
     @Transactional
-    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) {
+    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalCost = latestPrice.getAskPrice() * amount;
 
@@ -44,7 +48,7 @@ public class TradeService {
     }
 
     @Transactional
-    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) {
+    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalGain = latestPrice.getBidPrice() * amount;
 
