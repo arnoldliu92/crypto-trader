@@ -39,4 +39,10 @@ public class Price {
     @CreationTimestamp
     @Column(name = "timestamp")
     private Timestamp timestampCreated;
+
+    public Price(CryptoType cryptoType, double bidPrice, double askPrice) {
+        this.cryptoType = cryptoType;
+        this.bidPrice = bidPrice;
+        this.askPrice = askPrice;
+    }
 }
