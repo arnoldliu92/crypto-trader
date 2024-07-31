@@ -42,7 +42,7 @@ public class Price {
     private double askPrice;
 
     @CreationTimestamp
-    @Column(name = "timestamp")
+    @Column(name = "timestamp_created")
     private Timestamp timestampCreated;
 
     public Price(CryptoType cryptoType, double bidPrice, double askPrice) {

@@ -87,43 +87,43 @@ class TradeServiceTest {
         verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, -50000.0);
         verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTC, 1.0);
     }
-     
-    @Test
-    void sellCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
-        Trade sellTrade = new Trade(1L, TradeType.SELL, CryptoType.BTC, 50000.0, 1.0, sqlUtil.createCurrentTimestamp());
-        Wallet sellWallet = new Wallet(1L, CryptoType.BTC, 1.0);
-
-        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.BTC)).thenReturn(sellWallet);
-        doNothing().when(walletService).updateWalletBalance(anyLong(), any(CryptoType.class), anyDouble());
-        when(tradeRepository.save(any(Trade.class))).thenReturn(sellTrade);
-
-        Trade executedTrade = tradeService.sellCrypto(1001L, CryptoType.BTC, 1.0);
-
-        assertNotNull(executedTrade);
-        assertEquals(TradeType.SELL, executedTrade.getTradeType());
-        assertEquals(CryptoType.BTC, executedTrade.getCryptoType());
-        assertEquals(1.0, executedTrade.getAmount());
-
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTC, -1.0);
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, 50000.0);
-    }
-
-
-    @Test
-    void testPurchaseCryptoInsufficientFunds() {
-        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(new Wallet(1001L, CryptoType.USDT, 1000.0));
-
-        assertThrows(InsufficientBalanceException.class, () -> tradeService.purchaseCrypto(1001L, CryptoType.BTC, 1.0));
-    }
-
-    @Test
-    void testSellCryptoInsufficientFunds() {
-        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.BTC)).thenReturn(new Wallet(1001L, CryptoType.BTC, 0.5));
-
-        assertThrows(InsufficientBalanceException.class, () -> tradeService.sellCrypto(1001L, CryptoType.BTC, 1.0));
-    }
      */
+
+//
+//    @Test
+//    void sellCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
+//        Trade sellTrade = new Trade(1L, TradeType.SELL, CryptoType.BTC, 50000.0, 1.0, sqlUtil.createCurrentTimestamp());
+//        Wallet sellWallet = new Wallet(1L, CryptoType.BTC, 1.0);
+//
+//        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
+//        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.BTC)).thenReturn(sellWallet);
+//        doNothing().when(walletService).updateWalletBalance(anyLong(), any(CryptoType.class), anyDouble());
+//        when(tradeRepository.save(any(Trade.class))).thenReturn(sellTrade);
+//
+//        Trade executedTrade = tradeService.sellCrypto(1001L, CryptoType.BTC, 1.0);
+//
+//        assertNotNull(executedTrade);
+//        assertEquals(TradeType.SELL, executedTrade.getTradeType());
+//        assertEquals(CryptoType.BTC, executedTrade.getCryptoType());
+//        assertEquals(1.0, executedTrade.getAmount());
+//
+//        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTC, -1.0);
+//        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, 50000.0);
+//    }
+//
+//    @Test
+//    void testPurchaseCryptoInsufficientFunds() {
+//        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
+//        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(new Wallet(1001L, CryptoType.USDT, 1000.0));
+//
+//        assertThrows(InsufficientBalanceException.class, () -> tradeService.purchaseCrypto(1001L, CryptoType.BTC, 1.0));
+//    }
+//
+//    @Test
+//    void testSellCryptoInsufficientFunds() {
+//        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
+//        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.BTC)).thenReturn(new Wallet(1001L, CryptoType.BTC, 0.5));
+//
+//        assertThrows(InsufficientBalanceException.class, () -> tradeService.sellCrypto(1001L, CryptoType.BTC, 1.0));
+//    }
 }

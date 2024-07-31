@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface PriceRepository extends JpaRepository<Price, Long> {
-    @Query("SELECT p FROM Price p WHERE p.crypto_type = :cryptoType ORDER BY p.timestampCreated DESC LIMIT 1")
+    @Query("SELECT p FROM Price p WHERE p.crypto_type = :cryptoType ORDER BY p.timestamp_created DESC LIMIT 1")
     Optional<Price> findLatestPriceByCryptoType(@Param("cryptoType") CryptoType cryptoType);
 }
