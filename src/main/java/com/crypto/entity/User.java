@@ -1,25 +1,29 @@
 package com.crypto.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class User {
-    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private long id;
 
-    @NonNull
+    @NotNull(message = "Name is required")
+    @Column(name = "full_name")
     private String fullName;
-    @NonNull
+
+    @NotNull(message = "Email is required")
+    @Column(name = "email", unique = true)
     private String email;
+
+//    @Column(name = "usd_balance")
+//    private double usdBalance;
 
 }

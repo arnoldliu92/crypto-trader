@@ -3,9 +3,11 @@ package com.crypto.entity;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.DataSource;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
@@ -14,15 +16,19 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class Price {
-    private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY )
+    @Column(name = "price_id")
     private long id;
 
+    @NotNull(message = "Data Source is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "source")
     private DataSource dataSource;
 
+    @NotNull(message = "Crypto Type is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "crypto_type")
     private CryptoType cryptoType;
 
@@ -32,6 +38,7 @@ public class Price {
     @Column(name = "ask_price")
     private double askPrice;
 
+    @CreationTimestamp
     @Column(name = "timestamp")
     private Timestamp timestampCreated;
 
