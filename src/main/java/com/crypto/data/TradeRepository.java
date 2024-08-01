@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface TradeRepository extends JpaRepository<Trade, Long> {
-    @Query("SELECT t FROM Trade t WHERE t.user_id = :userId")
+    @Query("SELECT t FROM Trade t WHERE t.userId = :userId")
     List<Trade> findByUserId(@Param("userId") Long userId);
 }

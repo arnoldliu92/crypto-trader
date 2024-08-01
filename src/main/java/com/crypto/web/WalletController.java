@@ -1,6 +1,7 @@
 package com.crypto.web;
 
 import com.crypto.entity.Wallet;
+import com.crypto.exception.WalletNotFoundException;
 import com.crypto.service.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,12 @@ public class WalletController {
     @GetMapping("/{userId}/wallets")
     public ResponseEntity<List<Wallet>> getWalletsByUserId(@PathVariable Long userId) {
         logger.info("Getting wallets for {}...", userId);
-        List<Wallet> wallets = walletService.getWalletsByUserId(userId);
-        return ResponseEntity.ok(wallets);
+        try {
+            List<Wallet> wallets = walletService.getWalletsByUserId(userId);
+            return ResponseEntity.ok(wallets);
+        } catch (WalletNotFoundException exception) {
+            throw exception;
+        }
     }
 
     /**

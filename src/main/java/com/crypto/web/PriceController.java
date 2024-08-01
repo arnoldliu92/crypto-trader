@@ -26,7 +26,7 @@ public class PriceController {
      */
     @GetMapping("/latest")
     public ResponseEntity<List<Price>> getLatestBestAggregatedPrice() {
-        logger.info("Getting latest best aggretated price...");
+        logger.info("Getting latest best aggregated price...");
         List<Price> response = priceService.getLatestBestAggregatedPrice();
         return ResponseEntity.ok(response);
     }

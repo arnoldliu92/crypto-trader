@@ -5,17 +5,16 @@ import com.crypto.entity.Price;
 import com.crypto.enums.CryptoType;
 import com.crypto.exception.PriceNotFoundException;
 import com.crypto.util.PriceAggregatorUtil;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,21 +36,12 @@ class PriceServiceTest {
     @InjectMocks
     private PriceService priceService;
 
-    private Price btcPrice;
-    private Price ethPrice;
-
-    @BeforeEach
-    void setUp() {
-        btcPrice = new Price(CryptoType.BTC, 100.0, 110.0);
-        ethPrice = new Price(CryptoType.ETH, 300.0, 310.0);
-    }
-
     @Test
     void getLatestPrice_shouldReturnPrice_whenPriceExists() {
-        CryptoType cryptoType = CryptoType.BTC;
-        Price expectedPrice = btcPrice;
-        when(priceRepository.findLatestPriceByCryptoType(cryptoType)).thenReturn(Optional.of(expectedPrice));
-
+        CryptoType cryptoType = CryptoType.BTCUSDT;
+        Price expectedPrice = new Price(cryptoType, 100.0, 110.0);
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest)).thenReturn(List.of(expectedPrice));
         Price result = priceService.getLatestPrice(cryptoType);
 
         assertEquals(expectedPrice, result);
@@ -59,21 +49,25 @@ class PriceServiceTest {
 
     @Test
     void getLatestPrice_shouldThrowException_whenPriceNotFound() {
-        CryptoType cryptoType = CryptoType.ETH;
-        when(priceRepository.findLatestPriceByCryptoType(cryptoType)).thenReturn(Optional.empty());
+        CryptoType cryptoType = CryptoType.ETHUSDT;
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        when(priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest)).thenReturn(new ArrayList<>());
 
         assertThrows(PriceNotFoundException.class, () -> priceService.getLatestPrice(cryptoType));
     }
 
     @Test
     void getLatestBestAggregatedPrice_shouldReturnListOfPrices() {
+        Price btcPrice = new Price(CryptoType.BTCUSDT, 100.0, 110.0);
+        Price ethPrice = new Price(CryptoType.ETHUSDT, 300.0, 310.0);
+        PageRequest pageRequest = PageRequest.of(0, 1);
         for (CryptoType cryptoType : CryptoType.values()) {
-            if (cryptoType == CryptoType.BTC) {
-                when(priceRepository.findLatestPriceByCryptoType(cryptoType)).thenReturn(Optional.of(btcPrice));
-            } else if (cryptoType == CryptoType.ETH) {
-                when(priceRepository.findLatestPriceByCryptoType(cryptoType)).thenReturn(Optional.of(ethPrice));
+            if (cryptoType == CryptoType.BTCUSDT) {
+                when(priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest)).thenReturn(List.of(btcPrice));
+            } else if (cryptoType == CryptoType.ETHUSDT) {
+                when(priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest)).thenReturn(List.of(ethPrice));
             } else {
-                when(priceRepository.findLatestPriceByCryptoType(cryptoType)).thenReturn(Optional.empty());
+                when(priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest)).thenReturn(new ArrayList<>());
             }
         }
 
@@ -86,8 +80,8 @@ class PriceServiceTest {
 
     @Test
     void updatePrices_shouldSavePricesAndUpdateCache() {
-        Price[] btcPrices = { btcPrice };
-        Price[] ethPrices = { ethPrice };
+        Price[] btcPrices = { new Price(CryptoType.BTCUSDT, 100.0, 110.0) };
+        Price[] ethPrices = { new Price(CryptoType.ETHUSDT, 300.0, 310.0) };
         List<Price[]> bestPricesList = Arrays.asList(btcPrices, ethPrices);
         when(priceAggregatorUtil.getBestPricesList()).thenReturn(bestPricesList);
 

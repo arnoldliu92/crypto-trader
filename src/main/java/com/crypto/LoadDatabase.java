@@ -27,11 +27,11 @@ public class LoadDatabase {
     CommandLineRunner initDatabase() {
         return args -> {
             logger.debug("Preloading... " + userRepository.save(new User("Arnold Liu", "liuyengming.tw@gmail.com")));
-            Optional<Wallet> arnold = walletRepository.findIdByEmail("liuyengming.tw@gmail.com");
-            logger.debug("Preset Wallet balance 50,000 USDT... " + walletRepository.save(new Wallet(arnold.get().getUserId(), CryptoType.USDT, 50000.0)));
+            Optional<User> arnold = userRepository.findIdByEmail("liuyengming.tw@gmail.com");
+            logger.debug("Preset Wallet balance 50,000 USDT... " + walletRepository.save(new Wallet(arnold.get().getId(), CryptoType.USDT, 50000.0)));
             logger.debug("Preloading... " + userRepository.save(new User("Lloyd Forger", "lforger@gmail.com")));
-            Optional<Wallet> Lloyd = walletRepository.findIdByEmail("lforger@gmail.com");
-            logger.debug("Preset Wallet balance 50,000 USDT... " + walletRepository.save(new Wallet(arnold.get().getUserId(), CryptoType.USDT, 50000.0)));
+            Optional<User> Lloyd = userRepository.findIdByEmail("lforger@gmail.com");
+            logger.debug("Preset Wallet balance 50,000 USDT... " + walletRepository.save(new Wallet(arnold.get().getId(), CryptoType.USDT, 50000.0)));
         };
     }
 

@@ -1,6 +1,7 @@
 package com.crypto.service;
 
 import com.crypto.data.TradeRepository;
+import com.crypto.data.WalletRepository;
 import com.crypto.entity.Price;
 import com.crypto.entity.Trade;
 import com.crypto.entity.Wallet;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,6 +37,9 @@ class TradeServiceTest {
     private TradeRepository tradeRepository;
 
     @Mock
+    private WalletRepository walletRepository;
+
+    @Mock
     private WalletService walletService;
 
     @Mock
@@ -52,9 +57,9 @@ class TradeServiceTest {
 
     @BeforeEach
     void setUp() {
-        trade = new Trade(1001L, TradeType.BUY, CryptoType.BTC, 50000.0, 1.0, sqlUtil.createCurrentTimestamp());
-        wallet = new Wallet(1001L, CryptoType.USDT, 100000.0);
-        price = new Price(CryptoType.BTC, 50000.0, 51000.0);
+        trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 500.0, 1.0, sqlUtil.createCurrentTimestamp());
+        wallet = new Wallet(1001L, CryptoType.USDT, 1000.0);
+        price = new Price(CryptoType.BTCUSDT, 500.0, 510.0);
     }
 
     @Test
@@ -68,62 +73,58 @@ class TradeServiceTest {
         assertEquals(trade, history.get(0));
     }
 
-    /**
-     * Work in progress
     @Test
     void purchaseCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
-        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(wallet);
+        when(priceService.getLatestPrice(CryptoType.BTCUSDT)).thenReturn(price);
+        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(Optional.ofNullable(wallet));
         doNothing().when(walletService).updateWalletBalance(anyLong(), any(CryptoType.class), anyDouble());
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
 
-        Trade executedTrade = tradeService.purchaseCrypto(1001L, CryptoType.BTC, 1.0);
+        Trade executedTrade = tradeService.purchaseCrypto(1001L, CryptoType.BTCUSDT, 1.0);
 
         assertNotNull(executedTrade);
         assertEquals(TradeType.BUY, executedTrade.getTradeType());
-        assertEquals(CryptoType.BTC, executedTrade.getCryptoType());
+        assertEquals(CryptoType.BTCUSDT, executedTrade.getCryptoType());
         assertEquals(1.0, executedTrade.getAmount());
 
         verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, -50000.0);
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTC, 1.0);
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTCUSDT, 1.0);
     }
-     */
 
-//
-//    @Test
-//    void sellCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
-//        Trade sellTrade = new Trade(1L, TradeType.SELL, CryptoType.BTC, 50000.0, 1.0, sqlUtil.createCurrentTimestamp());
-//        Wallet sellWallet = new Wallet(1L, CryptoType.BTC, 1.0);
-//
-//        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-//        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.BTC)).thenReturn(sellWallet);
-//        doNothing().when(walletService).updateWalletBalance(anyLong(), any(CryptoType.class), anyDouble());
-//        when(tradeRepository.save(any(Trade.class))).thenReturn(sellTrade);
-//
-//        Trade executedTrade = tradeService.sellCrypto(1001L, CryptoType.BTC, 1.0);
-//
-//        assertNotNull(executedTrade);
-//        assertEquals(TradeType.SELL, executedTrade.getTradeType());
-//        assertEquals(CryptoType.BTC, executedTrade.getCryptoType());
-//        assertEquals(1.0, executedTrade.getAmount());
-//
-//        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTC, -1.0);
-//        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, 50000.0);
-//    }
-//
-//    @Test
-//    void testPurchaseCryptoInsufficientFunds() {
-//        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-//        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(new Wallet(1001L, CryptoType.USDT, 1000.0));
-//
-//        assertThrows(InsufficientBalanceException.class, () -> tradeService.purchaseCrypto(1001L, CryptoType.BTC, 1.0));
-//    }
-//
-//    @Test
-//    void testSellCryptoInsufficientFunds() {
-//        when(priceService.getLatestPrice(CryptoType.BTC)).thenReturn(price);
-//        when(walletService.getWalletByUserIdAndCryptoType(1001L, CryptoType.BTC)).thenReturn(new Wallet(1001L, CryptoType.BTC, 0.5));
-//
-//        assertThrows(InsufficientBalanceException.class, () -> tradeService.sellCrypto(1001L, CryptoType.BTC, 1.0));
-//    }
+    @Test
+    void sellCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
+        Trade sellTrade = new Trade(1L, TradeType.SELL, CryptoType.BTCUSDT, 50000.0, 1.0, sqlUtil.createCurrentTimestamp());
+        Wallet sellWallet = new Wallet(1L, CryptoType.BTCUSDT, 1.0);
+
+        when(priceService.getLatestPrice(CryptoType.BTCUSDT)).thenReturn(price);
+        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.BTCUSDT)).thenReturn(Optional.of(sellWallet));
+        doNothing().when(walletService).updateWalletBalance(anyLong(), any(CryptoType.class), anyDouble());
+        when(tradeRepository.save(any(Trade.class))).thenReturn(sellTrade);
+
+        Trade executedTrade = tradeService.sellCrypto(1001L, CryptoType.BTCUSDT, 1.0);
+
+        assertNotNull(executedTrade);
+        assertEquals(TradeType.SELL, executedTrade.getTradeType());
+        assertEquals(CryptoType.BTCUSDT, executedTrade.getCryptoType());
+        assertEquals(1.0, executedTrade.getAmount());
+
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTCUSDT, -1.0);
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, 50000.0);
+    }
+
+    @Test
+    void testPurchaseCryptoInsufficientFunds() {
+        when(priceService.getLatestPrice(CryptoType.BTCUSDT)).thenReturn(price);
+        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(Optional.of(new Wallet(1001L, CryptoType.USDT, 10.0)));
+
+        assertThrows(InsufficientBalanceException.class, () -> tradeService.purchaseCrypto(1001L, CryptoType.BTCUSDT, 10000.0));
+    }
+
+    @Test
+    void testSellCryptoInsufficientFunds() {
+        when(priceService.getLatestPrice(CryptoType.BTCUSDT)).thenReturn(price);
+        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.BTCUSDT)).thenReturn(Optional.of(new Wallet(1001L, CryptoType.BTCUSDT, 1.0)));
+
+        assertThrows(InsufficientBalanceException.class, () -> tradeService.sellCrypto(1001L, CryptoType.BTCUSDT, 10.0));
+    }
 }

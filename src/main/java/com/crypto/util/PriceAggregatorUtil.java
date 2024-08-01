@@ -43,6 +43,7 @@ public class PriceAggregatorUtil {
 
         List<Pair<String, CryptoTickerResponse[]>> fullListOfCryptoTicker = fetchTickerPrices();
         for (CryptoType cryptoType : CryptoType.values()) {
+            if (cryptoType.equals(CryptoType.USDT)) continue;
             bestPrices.add(getBestPriceDetails(fullListOfCryptoTicker, cryptoType));
         }
 
@@ -68,7 +69,7 @@ public class PriceAggregatorUtil {
             String response = restTemplate.getForObject(nestedResponse.getApiUrl(), String.class);
             try {
                 CryptoNestedTickerResponse cryptoNestedTickerResponse = objectMapper.readValue(response, CryptoNestedTickerResponse.class);
-                fullListOfCryptoTicker.add(Pair.of(nestedResponse.toString(), cryptoNestedTickerResponse.getCryptoTickerResponses()));
+                fullListOfCryptoTicker.add(Pair.of(nestedResponse.toString(), cryptoNestedTickerResponse.getData()));
             } catch (IOException exception) {
                 logger.error("Failed to parse Nested response", exception);
             }
@@ -78,10 +79,10 @@ public class PriceAggregatorUtil {
     }
 
     /**
-     * Iterate through the full list of Cryto Ticker response gotten from all the cryto source websites
+     * Iterate through the full list of Crypto Ticker response gotten from all the cryto source websites
      *
      * @param cryptoType    Type of crypto interested in finding the best bid or ask price
-     * @param fullList      The full list of Cryto Ticker response gotten from all the cryto source websites,
+     * @param fullList      The full list of Crypto Ticker response gotten from all the cryto source websites,
      *                      the pair also stores the source website as the first element
      * @return              Price[] { bestBidPrice, bestAskPrice }
      */
@@ -90,7 +91,7 @@ public class PriceAggregatorUtil {
         Price bestAskPrice = new Price();
         for (Pair<String, CryptoTickerResponse[]> tickers : fullList) {
             for (CryptoTickerResponse ticker : tickers.getSecond()) {
-                if (ticker.getSymbol().equals(cryptoType)) {
+                if (ticker.getSymbol().equalsIgnoreCase(cryptoType.toString())) {
                     Price[] comparePair = setPriceDetails(ticker, bestBidPrice, bestAskPrice, tickers.getFirst());
                     bestBidPrice = comparePair[0];
                     bestAskPrice = comparePair[1];
@@ -118,7 +119,7 @@ public class PriceAggregatorUtil {
     private Price[] setPriceDetails(CryptoTickerResponse ticker, Price bestBidPrice, Price bestAskPrice, String source) {
         if (bestBidPrice.getCryptoType() == null) {
             bestBidPrice.setDataSource(DataSource.valueOf(source));
-            bestBidPrice.setCryptoType(ticker.getSymbol());
+            bestBidPrice.setCryptoType(CryptoType.valueOf(ticker.getSymbol()));
             bestBidPrice.setBidPrice(ticker.getBidPrice());
             bestBidPrice.setAskPrice(ticker.getAskPrice());
         } else if (bestBidPrice.getBidPrice() < ticker.getBidPrice()) {
@@ -127,7 +128,7 @@ public class PriceAggregatorUtil {
         }
         if (bestAskPrice.getCryptoType() == null) {
             bestAskPrice.setDataSource(DataSource.valueOf(source));
-            bestAskPrice.setCryptoType(ticker.getSymbol());
+            bestAskPrice.setCryptoType(CryptoType.valueOf(ticker.getSymbol()));
             bestAskPrice.setBidPrice(ticker.getBidPrice());
             bestAskPrice.setAskPrice(ticker.getAskPrice());
         } else if (bestAskPrice.getAskPrice() > ticker.getAskPrice()) {

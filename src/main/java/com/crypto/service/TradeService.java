@@ -33,8 +33,8 @@ public class TradeService {
         return tradeRepository.findByUserId(userId);
     }
 
-    @Transactional
-    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
+    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalCost = latestPrice.getAskPrice() * amount;
 
@@ -47,8 +47,8 @@ public class TradeService {
         return tradeRepository.save(trade);
     }
 
-    @Transactional
-    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
+    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalGain = latestPrice.getBidPrice() * amount;
 

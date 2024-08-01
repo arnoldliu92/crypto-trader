@@ -36,7 +36,7 @@ class TradeControllerTest {
 
     @BeforeEach
     public void setUp() {
-        trade = new Trade(1001L, TradeType.BUY, CryptoType.BTC, 50000.0, 1.0, null);
+        trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 50000.0, 1.0, null);
     }
 
     @Test
@@ -55,11 +55,11 @@ class TradeControllerTest {
     void executeTrade_purchaseOperationDoneOnce() {
         when(tradeService.purchaseCrypto(anyLong(), any(CryptoType.class), anyDouble())).thenReturn(trade);
 
-        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, TradeType.BUY, CryptoType.BTC, 1.0);
+        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 1.0);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trade, response.getBody());
-        verify(tradeService, times(1)).purchaseCrypto(1001L, CryptoType.BTC, 1.0);
+        verify(tradeService, times(1)).purchaseCrypto(1001L, CryptoType.BTCUSDT, 1.0);
     }
 
     @Test
@@ -67,10 +67,10 @@ class TradeControllerTest {
         trade.setTradeType(TradeType.SELL);
         when(tradeService.sellCrypto(anyLong(), any(CryptoType.class), anyDouble())).thenReturn(trade);
 
-        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, TradeType.SELL, CryptoType.BTC, 1.0);
+        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, TradeType.SELL, CryptoType.BTCUSDT, 1.0);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trade, response.getBody());
-        verify(tradeService, times(1)).sellCrypto(1001L, CryptoType.BTC, 1.0);
+        verify(tradeService, times(1)).sellCrypto(1001L, CryptoType.BTCUSDT, 1.0);
     }
 }

@@ -3,7 +3,9 @@ package com.crypto.web;
 import com.crypto.entity.Trade;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.TradeType;
+import com.crypto.exception.InsufficientBalanceException;
 import com.crypto.exception.InvalidInputException;
+import com.crypto.exception.WalletNotFoundException;
 import com.crypto.service.TradeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +57,18 @@ public class TradeController {
             @RequestParam CryptoType cryptoType,
             @RequestParam double amount) {
         logger.info("Initiating {} trade for {} using {} by {}", tradeType, userId, cryptoType, amount);
-        Trade trade;
-        if (TradeType.BUY.equals(tradeType)) {
-            trade = tradeService.purchaseCrypto(userId, cryptoType, amount);
-        } else if (TradeType.SELL.equals(tradeType)) {
-            trade = tradeService.sellCrypto(userId, cryptoType, amount);
-        } else {
-            throw new InvalidInputException(tradeType);
+        try {
+            Trade trade;
+            if (TradeType.BUY.equals(tradeType)) {
+                trade = tradeService.purchaseCrypto(userId, cryptoType, amount);
+            } else if (TradeType.SELL.equals(tradeType)) {
+                trade = tradeService.sellCrypto(userId, cryptoType, amount);
+            } else {
+                throw new InvalidInputException(tradeType);
+            }
+            return ResponseEntity.ok(trade);
+        } catch (WalletNotFoundException | InsufficientBalanceException exception) {
+            throw exception;
         }
-        return ResponseEntity.ok(trade);
     }
 }
