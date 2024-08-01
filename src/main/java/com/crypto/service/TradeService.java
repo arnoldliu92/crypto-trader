@@ -8,8 +8,6 @@ import com.crypto.enums.TradeType;
 import com.crypto.exception.InsufficientBalanceException;
 import com.crypto.exception.WalletNotFoundException;
 import com.crypto.util.SqlUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +16,6 @@ import java.util.List;
 
 @Service
 public class TradeService {
-    private static final Logger logger = LoggerFactory.getLogger(TradeService.class);
-
     @Autowired
     private TradeRepository tradeRepository;
     @Autowired

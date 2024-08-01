@@ -1,7 +1,6 @@
 package com.crypto.data;
 
 import com.crypto.entity.User;
-import com.crypto.entity.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

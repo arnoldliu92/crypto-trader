@@ -28,14 +28,10 @@ public class WalletController {
      * @return  a list of Wallet objects for the user
      */
     @GetMapping("/{userId}/wallets")
-    public ResponseEntity<List<Wallet>> getWalletsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<Wallet>> getWalletsByUserId(@PathVariable Long userId) throws WalletNotFoundException {
         logger.info("Getting wallets for {}...", userId);
-        try {
-            List<Wallet> wallets = walletService.getWalletsByUserId(userId);
-            return ResponseEntity.ok(wallets);
-        } catch (WalletNotFoundException exception) {
-            throw exception;
-        }
+        List<Wallet> wallets = walletService.getWalletsByUserId(userId);
+        return ResponseEntity.ok(wallets);
     }
 
     /**

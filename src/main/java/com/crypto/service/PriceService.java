@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PriceService {
@@ -77,6 +76,6 @@ public class PriceService {
     @CacheEvict(value = "latestPrice", key = "#cryptoType")
     private void updateLatestPriceCache(CryptoType cryptoType) {
         // This method is used to evict the cache entry for a specific crypto type
-        logger.debug("Evicting cache for crypto type: " + cryptoType);
+        logger.debug("Evicting cache for crypto type: {}", cryptoType);
     }
 }
