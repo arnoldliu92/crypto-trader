@@ -1,4 +1,4 @@
-package com.aquariux.crypto_trader;
+package com.crypto;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,6 +8,7 @@ class CryptoTradingApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
