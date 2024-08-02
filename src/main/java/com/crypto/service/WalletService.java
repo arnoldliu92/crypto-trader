@@ -39,7 +39,7 @@ public class WalletService {
      * @param cryptoType    the type of currency (e.g. USDT, ETH, BTC)
      * @return              Wallet object
      */
-    public Wallet getWalletByUserIdAndCryptoType(Long userId, CryptoType cryptoType) {
+    public Wallet getWalletByUserIdAndCryptoType(Long userId, CryptoType cryptoType) throws WalletNotFoundException {
         return walletRepository.findByUserIdAndCryptoType(userId, cryptoType)
                 .orElseThrow(() -> new WalletNotFoundException(userId, cryptoType));
     }
@@ -54,8 +54,8 @@ public class WalletService {
      * @param cryptoType the type of currency (e.g. USDT, ETH, BTC)
      * @param amount     the amount to update the wallet by
      */
-    @Transactional
-    public void updateWalletBalance(Long userId, CryptoType cryptoType, Double amount) {
+    @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
+    public void updateWalletBalance(Long userId, CryptoType cryptoType, Double amount) throws WalletNotFoundException, InsufficientBalanceException {
         logger.debug("Updating {} user {} account by {} amount...", userId, cryptoType, amount);
 
         Wallet wallet = walletRepository.findByUserIdAndCryptoType(userId, cryptoType)

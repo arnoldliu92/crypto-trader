@@ -7,7 +7,6 @@ import com.crypto.entity.Wallet;
 import com.crypto.enums.CryptoType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,20 +17,18 @@ import java.util.Optional;
 public class LoadDatabase {
     private static final Logger logger = LoggerFactory.getLogger(LoadDatabase.class);
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private WalletRepository walletRepository;
-
     @Bean
-    CommandLineRunner initDatabase() {
+    CommandLineRunner initDatabase(UserRepository userRepository, WalletRepository walletRepository) {
         return args -> {
-            logger.debug("Preloading... " + userRepository.save(new User("Arnold Liu", "liuyengming.tw@gmail.com")));
-            Optional<Wallet> arnold = walletRepository.findIdByEmail("liuyengming.tw@gmail.com");
-            logger.debug("Preset Wallet balance 50,000 USDT... " + walletRepository.save(new Wallet(arnold.get().getUserId(), CryptoType.USDT, 50000.0)));
-            logger.debug("Preloading... " + userRepository.save(new User("Lloyd Forger", "lforger@gmail.com")));
-            Optional<Wallet> Lloyd = walletRepository.findIdByEmail("lforger@gmail.com");
-            logger.debug("Preset Wallet balance 50,000 USDT... " + walletRepository.save(new Wallet(arnold.get().getUserId(), CryptoType.USDT, 50000.0)));
+            logger.debug("Preloading... Preset Wallet balance 50,000 USDT...");
+            userRepository.save(new User("Arnold Liu", "liuyengming.tw@gmail.com"));
+            Optional<User> arnold = userRepository.findIdByEmail("liuyengming.tw@gmail.com");
+            walletRepository.save(new Wallet(arnold.get().getId(), CryptoType.USDT, 50000.0));
+            logger.debug("Preloading... Preset Wallet balance 50,000 USDT...");
+            userRepository.save(new User("Lloyd Forger", "lforger@gmail.com"));
+            Optional<User> lloyd = userRepository.findIdByEmail("lforger@gmail.com");
+            walletRepository.save(new Wallet(lloyd.get().getId(), CryptoType.USDT, 50000.0));
+            logger.debug("Preloading Done... ");
         };
     }
 
