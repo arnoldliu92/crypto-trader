@@ -101,17 +101,17 @@ class WalletServiceTest {
 
     @Test
     void updateWalletBalance_CreateNewWallet() {
-        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.ETH)).thenReturn(Optional.empty());
+        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.ETHUSDT)).thenReturn(Optional.empty());
 
-        walletService.updateWalletBalance(1001L, CryptoType.ETH, 50.0);
+        walletService.updateWalletBalance(1001L, CryptoType.ETHUSDT, 50.0);
 
         verify(walletRepository, times(1)).save(any(Wallet.class));
     }
 
     @Test
     void updateWalletBalance_CreateNewWalletWithNegativeBalance() {
-        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.ETH)).thenReturn(Optional.empty());
+        when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.ETHUSDT)).thenReturn(Optional.empty());
 
-        assertThrows(WalletNotFoundException.class, () -> walletService.updateWalletBalance(1001L, CryptoType.ETH, -50.0));
+        assertThrows(WalletNotFoundException.class, () -> walletService.updateWalletBalance(1001L, CryptoType.ETHUSDT, -50.0));
     }
 }

@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PriceService {
@@ -26,12 +26,14 @@ public class PriceService {
     @Autowired
     private PriceAggregatorUtil priceAggregatorUtil;
 
-    public Price getLatestPrice(CryptoType cryptoType) {
-        return priceRepository.findLatestPriceByCryptoType(cryptoType)
-                .orElseThrow(() -> {
-                    logger.error("Unable to get the latest price for {}", cryptoType);
-                    return new PriceNotFoundException(cryptoType);
-                });
+    public Price getLatestPrice(CryptoType cryptoType) throws PriceNotFoundException {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        List<Price> priceList = priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest);
+        if (priceList.isEmpty()) {
+            logger.error("Unable to get the latest price for {}", cryptoType);
+            throw new PriceNotFoundException(cryptoType);
+        }
+        return priceList.get(0);
     }
 
     @Cacheable("latestBestPrice")
@@ -40,8 +42,9 @@ public class PriceService {
         CryptoType[] cryptoTypes = CryptoType.values();
         for (CryptoType cryptoType : cryptoTypes) {
             try {
-                Optional<Price> latestBestPrice = priceRepository.findLatestPriceByCryptoType(cryptoType);
-                latestBestPrice.ifPresent(bestPricesList::add);
+                PageRequest pageRequest = PageRequest.of(0, 1);
+                List<Price> latestBestPrice = priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest);
+                bestPricesList.addAll(latestBestPrice);
             } catch (PriceNotFoundException exception) {
                 logger.error("Failed to fetch latest best aggregated price for {}", cryptoType, exception);
             }
@@ -73,6 +76,6 @@ public class PriceService {
     @CacheEvict(value = "latestPrice", key = "#cryptoType")
     private void updateLatestPriceCache(CryptoType cryptoType) {
         // This method is used to evict the cache entry for a specific crypto type
-        logger.debug("Evicting cache for crypto type: " + cryptoType);
+        logger.debug("Evicting cache for crypto type: {}", cryptoType);
     }
 }

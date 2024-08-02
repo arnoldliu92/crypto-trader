@@ -8,8 +8,6 @@ import com.crypto.enums.TradeType;
 import com.crypto.exception.InsufficientBalanceException;
 import com.crypto.exception.WalletNotFoundException;
 import com.crypto.util.SqlUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +16,6 @@ import java.util.List;
 
 @Service
 public class TradeService {
-    private static final Logger logger = LoggerFactory.getLogger(TradeService.class);
-
     @Autowired
     private TradeRepository tradeRepository;
     @Autowired
@@ -33,8 +29,8 @@ public class TradeService {
         return tradeRepository.findByUserId(userId);
     }
 
-    @Transactional
-    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
+    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalCost = latestPrice.getAskPrice() * amount;
 
@@ -47,8 +43,8 @@ public class TradeService {
         return tradeRepository.save(trade);
     }
 
-    @Transactional
-    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
+    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalGain = latestPrice.getBidPrice() * amount;
 

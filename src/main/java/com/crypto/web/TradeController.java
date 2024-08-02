@@ -3,7 +3,9 @@ package com.crypto.web;
 import com.crypto.entity.Trade;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.TradeType;
+import com.crypto.exception.InsufficientBalanceException;
 import com.crypto.exception.InvalidInputException;
+import com.crypto.exception.WalletNotFoundException;
 import com.crypto.service.TradeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -49,11 +51,11 @@ public class TradeController {
      * @return              Trade object
      */
     @PostMapping
-    public ResponseEntity<Trade> executeTrade(
-            @RequestParam Long userId,
-            @RequestParam TradeType tradeType,
-            @RequestParam CryptoType cryptoType,
-            @RequestParam double amount) {
+    public ResponseEntity<Trade> executeTrade (
+            @RequestHeader Long userId,
+            @RequestHeader TradeType tradeType,
+            @RequestHeader CryptoType cryptoType,
+            @RequestHeader double amount) throws WalletNotFoundException, InsufficientBalanceException {
         logger.info("Initiating {} trade for {} using {} by {}", tradeType, userId, cryptoType, amount);
         Trade trade;
         if (TradeType.BUY.equals(tradeType)) {
