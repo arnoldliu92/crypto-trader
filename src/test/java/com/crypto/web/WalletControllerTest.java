@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,7 +30,7 @@ class WalletControllerTest {
 
     @Test
     void getWalletsByUserId_shouldReturnListOfWalletsOwnedByUser() {
-        Wallet expectedWallet = new Wallet(1001L, CryptoType.USDT, 100.0);
+        Wallet expectedWallet = new Wallet(1001L, CryptoType.USDT, BigDecimal.valueOf(100.0));
         List<Wallet> expectedWalletList = List.of(expectedWallet);
         when(walletService.getWalletsByUserId(anyLong())).thenReturn(expectedWalletList);
 

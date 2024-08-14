@@ -4,26 +4,28 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"high", "open", "count", "vol", "low", "bidQty", "askSize", "askQty", "bidSize", "close", "amount"})
 public class CryptoTickerResponse {
     private String symbol;
 
     @JsonProperty(value = "bidPrice", required = false)
-    private Double bidPrice;
+    private BigDecimal bidPrice;
 
     @JsonProperty(value = "askPrice", required = false)
-    private Double askPrice;
+    private BigDecimal askPrice;
 
     @JsonProperty(value = "bid", required = false)
-    public void setBidFromBid(Double bid) {
+    public void setBidFromBid(BigDecimal bid) {
         if (this.bidPrice == null) {
             this.bidPrice = bid;
         }
     }
 
     @JsonProperty(value = "ask", required = false)
-    public void setAskFromAsk(Double ask) {
+    public void setAskFromAsk(BigDecimal ask) {
         if (this.askPrice == null) {
             this.askPrice = ask;
         }

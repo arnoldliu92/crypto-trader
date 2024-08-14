@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,12 +48,12 @@ class TradeServiceTest {
 
     @BeforeEach
     void setUp() {
-        price = new Price(CryptoType.BTCUSDT, 500.0, 510.0);
+        price = new Price(CryptoType.BTCUSDT, BigDecimal.valueOf(500.0), BigDecimal.valueOf(510.0));
     }
 
     @Test
     void getTradingHistory_shouldReturnListOfTradeHistories() {
-        Trade trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 500.0, 1.0, sqlUtil.createCurrentTimestamp());
+        Trade trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, BigDecimal.valueOf(500.0), BigDecimal.ONE, sqlUtil.createCurrentTimestamp());
         when(tradeRepository.findByUserId(1001L)).thenReturn(List.of(trade));
 
         List<Trade> history = tradeService.getTradingHistory(1001L);
@@ -63,40 +64,40 @@ class TradeServiceTest {
 
     @Test
     void purchaseCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
-        Trade trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 500.0, 1.0, sqlUtil.createCurrentTimestamp());
+        Trade trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, BigDecimal.valueOf(500.0), BigDecimal.ONE, sqlUtil.createCurrentTimestamp());
         when(priceService.getLatestPrice(CryptoType.BTCUSDT)).thenReturn(price);
-        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.USDT, -510.0);
-        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.BTCUSDT, 1.0);
+        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(-510.0));
+        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.BTCUSDT, BigDecimal.ONE);
         when(tradeRepository.save(any(Trade.class))).thenReturn(trade);
 
-        TradeRequest tradeRequest = new TradeRequest(TradeType.BUY, CryptoType.BTCUSDT, 1.0);
+        TradeRequest tradeRequest = new TradeRequest(TradeType.BUY, CryptoType.BTCUSDT, BigDecimal.ONE);
         Trade executedTrade = tradeService.filterTrade(1001L, tradeRequest);
         assertNotNull(executedTrade);
         assertEquals(TradeType.BUY, executedTrade.getTradeType());
         assertEquals(CryptoType.BTCUSDT, executedTrade.getCryptoType());
-        assertEquals(1.0, executedTrade.getAmount());
+        assertEquals(BigDecimal.ONE, executedTrade.getAmount());
 
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, -510.0);
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTCUSDT, 1.0);
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(-510.0));
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTCUSDT, BigDecimal.ONE);
     }
 
     @Test
     void sellCrypto_shouldExecuteTradeAndUpdateWalletBalance() {
-        Trade sellTrade = new Trade(1L, TradeType.SELL, CryptoType.BTCUSDT, 50000.0, 1.0, sqlUtil.createCurrentTimestamp());
+        Trade sellTrade = new Trade(1L, TradeType.SELL, CryptoType.BTCUSDT, BigDecimal.valueOf(50000.0), BigDecimal.ONE, sqlUtil.createCurrentTimestamp());
         when(priceService.getLatestPrice(CryptoType.BTCUSDT)).thenReturn(price);
-        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.BTCUSDT, -1.0);
-        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.USDT, 500.0);
+        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.BTCUSDT, BigDecimal.ONE.negate());
+        doNothing().when(walletService).updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(500.0));
         when(tradeRepository.save(any(Trade.class))).thenReturn(sellTrade);
 
-        TradeRequest tradeRequest = new TradeRequest(TradeType.SELL, CryptoType.BTCUSDT, 1.0);
+        TradeRequest tradeRequest = new TradeRequest(TradeType.SELL, CryptoType.BTCUSDT, BigDecimal.ONE);
         Trade executedTrade = tradeService.filterTrade(1001L, tradeRequest);
         assertNotNull(executedTrade);
         assertEquals(TradeType.SELL, executedTrade.getTradeType());
         assertEquals(CryptoType.BTCUSDT, executedTrade.getCryptoType());
-        assertEquals(1.0, executedTrade.getAmount());
+        assertEquals(BigDecimal.ONE, executedTrade.getAmount());
 
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTCUSDT, -1.0);
-        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, 500.0);
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.BTCUSDT, BigDecimal.ONE.negate());
+        verify(walletService, times(1)).updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(500.0));
     }
 
 //    @Test

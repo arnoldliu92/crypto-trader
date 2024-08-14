@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -55,19 +56,19 @@ public class WalletService {
      * @param amount     the amount to update the wallet by
      */
     @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
-    public void updateWalletBalance(Long userId, CryptoType cryptoType, Double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    public void updateWalletBalance(Long userId, CryptoType cryptoType, BigDecimal amount) throws WalletNotFoundException, InsufficientBalanceException {
         logger.debug("Updating {} user {} account by {} amount...", userId, cryptoType, amount);
 
         Wallet wallet = walletRepository.findByUserIdAndCryptoType(userId, cryptoType)
                 .orElseGet(() -> {
-                    if (amount > 0) {
-                        return new Wallet(userId, cryptoType, 0.0);
+                    if (amount.compareTo(BigDecimal.ZERO) > 0) {
+                        return new Wallet(userId, cryptoType, BigDecimal.ZERO);
                     }
                     throw new WalletNotFoundException(userId, cryptoType);
                 });
 
-        double newBalance = wallet.getBalance() + amount;
-        if (newBalance < 0) {
+        BigDecimal newBalance = wallet.getBalance().add(amount);
+        if (newBalance.compareTo(BigDecimal.ZERO)  < 0) {
             throw new InsufficientBalanceException(userId, CryptoType.USDT, wallet.getBalance(), amount);
         }
 

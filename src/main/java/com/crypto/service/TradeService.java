@@ -13,8 +13,8 @@ import com.crypto.util.SqlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -46,12 +46,12 @@ public class TradeService {
     }
 
     @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
-    private Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, BigDecimal amount) throws WalletNotFoundException, InsufficientBalanceException {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
-        double totalCost = latestPrice.getAskPrice() * amount;
+        BigDecimal totalCost = latestPrice.getAskPrice().multiply(amount);
 
         // Check if user has enough USDT and deduct
-        walletService.updateWalletBalance(userId, CryptoType.USDT, -totalCost);
+        walletService.updateWalletBalance(userId, CryptoType.USDT, totalCost.negate());
         // Add purchased crypto to user's wallet
         walletService.updateWalletBalance(userId, cryptoType, amount);
 
@@ -60,12 +60,12 @@ public class TradeService {
     }
 
     @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
-    private Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
+    public Trade sellCrypto(Long userId, CryptoType cryptoType, BigDecimal amount) throws WalletNotFoundException, InsufficientBalanceException {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
-        double totalGain = latestPrice.getBidPrice() * amount;
+        BigDecimal totalGain = latestPrice.getBidPrice().multiply(amount);
 
         // Deduct sold crypto from user's wallet
-        walletService.updateWalletBalance(userId, cryptoType, -amount);
+        walletService.updateWalletBalance(userId, cryptoType, amount.negate());
         // Add gained USDT to user's wallet
         walletService.updateWalletBalance(userId, CryptoType.USDT, totalGain);
 

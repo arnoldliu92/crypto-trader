@@ -14,11 +14,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,7 +38,7 @@ class TradeControllerTest {
 
     @BeforeEach
     public void setUp() {
-        trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 50000.0, 1.0, null);
+        trade = new Trade(1001L, TradeType.BUY, CryptoType.BTCUSDT, BigDecimal.valueOf(50000.0), BigDecimal.ONE, null);
     }
 
     @Test
@@ -47,7 +48,7 @@ class TradeControllerTest {
         ResponseEntity<List<Trade>> response = tradeController.getTradingHistory(1001L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
+        assertEquals(1, Objects.requireNonNull(response.getBody()).size());
         assertEquals(trade, response.getBody().get(0));
         verify(tradeService, times(1)).getTradingHistory(1001L);
     }
@@ -56,7 +57,7 @@ class TradeControllerTest {
     void executeTrade_purchaseOperationDoneOnce() {
         when(tradeService.filterTrade(anyLong(), any(TradeRequest.class))).thenReturn(trade);
 
-        TradeRequest actualTradeRequest = new TradeRequest(TradeType.BUY, CryptoType.BTCUSDT, 1.0);
+        TradeRequest actualTradeRequest = new TradeRequest(TradeType.BUY, CryptoType.BTCUSDT, BigDecimal.ONE);
         ResponseEntity<Trade> response = tradeController.executeTrade(1001L, actualTradeRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -69,7 +70,7 @@ class TradeControllerTest {
         trade.setTradeType(TradeType.SELL);
         when(tradeService.filterTrade(anyLong(), any(TradeRequest.class))).thenReturn(trade);
 
-        TradeRequest actualTradeRequest = new TradeRequest(TradeType.SELL, CryptoType.BTCUSDT, 1.0);
+        TradeRequest actualTradeRequest = new TradeRequest(TradeType.SELL, CryptoType.BTCUSDT, BigDecimal.ONE);
         ResponseEntity<Trade> response = tradeController.executeTrade(1001L, actualTradeRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());

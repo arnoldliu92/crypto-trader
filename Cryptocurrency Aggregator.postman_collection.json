@@ -102,23 +102,17 @@
 						"key": "userId",
 						"value": "{{userId}}",
 						"type": "text"
-					},
-					{
-						"key": "tradeType",
-						"value": "BUY",
-						"type": "text"
-					},
-					{
-						"key": "cryptoType",
-						"value": "ETHUSDT",
-						"type": "text"
-					},
-					{
-						"key": "amount",
-						"value": "1",
-						"type": "text"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tradeType\": \"BUY\",\r\n    \"cryptoType\": \"ETHUSDT\",\r\n    \"amount\": 10.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "http://localhost:8080/api/v1/trades",
 					"protocol": "http",
@@ -156,23 +150,17 @@
 						"key": "userId",
 						"value": "{{userId}}",
 						"type": "text"
-					},
-					{
-						"key": "tradeType",
-						"value": "BUY",
-						"type": "text"
-					},
-					{
-						"key": "cryptoType",
-						"value": "ETHUSDT",
-						"type": "text"
-					},
-					{
-						"key": "amount",
-						"value": "1",
-						"type": "text"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tradeType\": \"SELL\",\r\n    \"cryptoType\": \"ETHUSDT\",\r\n    \"amount\": 1.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "http://localhost:8080/api/v1/trades",
 					"protocol": "http",

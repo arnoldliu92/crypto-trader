@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +40,7 @@ class PriceServiceTest {
     @Test
     void getLatestPrice_shouldReturnPrice_whenPriceExists() {
         CryptoType cryptoType = CryptoType.BTCUSDT;
-        Price expectedPrice = new Price(cryptoType, 100.0, 110.0);
+        Price expectedPrice = new Price(cryptoType, BigDecimal.valueOf(100.0), BigDecimal.valueOf(110.0));
         PageRequest pageRequest = PageRequest.of(0, 1);
         when(priceRepository.findLatestPriceByCryptoType(cryptoType, pageRequest)).thenReturn(List.of(expectedPrice));
         Price result = priceService.getLatestPrice(cryptoType);
@@ -58,8 +59,8 @@ class PriceServiceTest {
 
     @Test
     void getLatestBestAggregatedPrice_shouldReturnListOfPrices() {
-        Price btcPrice = new Price(CryptoType.BTCUSDT, 100.0, 110.0);
-        Price ethPrice = new Price(CryptoType.ETHUSDT, 300.0, 310.0);
+        Price btcPrice = new Price(CryptoType.BTCUSDT, BigDecimal.valueOf(100.0), BigDecimal.valueOf(110.0));
+        Price ethPrice = new Price(CryptoType.ETHUSDT, BigDecimal.valueOf(300.0), BigDecimal.valueOf(310.0));
         PageRequest pageRequest = PageRequest.of(0, 1);
         for (CryptoType cryptoType : CryptoType.values()) {
             if (cryptoType == CryptoType.BTCUSDT) {
@@ -80,8 +81,8 @@ class PriceServiceTest {
 
     @Test
     void updatePrices_shouldSavePricesAndUpdateCache() {
-        Price[] btcPrices = { new Price(CryptoType.BTCUSDT, 100.0, 110.0) };
-        Price[] ethPrices = { new Price(CryptoType.ETHUSDT, 300.0, 310.0) };
+        Price[] btcPrices = { new Price(CryptoType.BTCUSDT, BigDecimal.valueOf(100.0), BigDecimal.valueOf(110.0)) };
+        Price[] ethPrices = { new Price(CryptoType.ETHUSDT, BigDecimal.valueOf(300.0), BigDecimal.valueOf(310.0)) };
         List<Price[]> bestPricesList = Arrays.asList(btcPrices, ethPrices);
         when(priceAggregatorUtil.getBestPricesList()).thenReturn(bestPricesList);
 

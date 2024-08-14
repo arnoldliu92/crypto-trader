@@ -12,6 +12,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -32,9 +34,9 @@ public class Wallet {
 
     @NotNull(message = "Balance is required")
     @Column(name = "balance")
-    private double balance;
+    private BigDecimal balance;
 
-    public Wallet(long userId, CryptoType cryptoType, double balance) {
+    public Wallet(long userId, CryptoType cryptoType, BigDecimal balance) {
         this.userId = userId;
         this.cryptoType = cryptoType;
         this.balance = balance;

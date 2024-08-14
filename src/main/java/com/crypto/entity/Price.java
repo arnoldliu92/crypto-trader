@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -36,16 +37,16 @@ public class Price {
     private CryptoType cryptoType;
 
     @Column(name = "bid_price")
-    private double bidPrice;
+    private BigDecimal bidPrice;
 
     @Column(name = "ask_price")
-    private double askPrice;
+    private BigDecimal askPrice;
 
     @CreationTimestamp
     @Column(name = "timestamp_created")
     private Timestamp timestampCreated;
 
-    public Price(CryptoType cryptoType, double bidPrice, double askPrice) {
+    public Price(CryptoType cryptoType, BigDecimal bidPrice, BigDecimal askPrice) {
         this.cryptoType = cryptoType;
         this.bidPrice = bidPrice;
         this.askPrice = askPrice;

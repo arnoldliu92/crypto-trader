@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Configuration
@@ -23,11 +24,11 @@ public class LoadDatabase {
             logger.debug("Preloading... Preset Wallet balance 50,000 USDT...");
             userRepository.save(new User("Arnold Liu", "liuyengming.tw@gmail.com"));
             Optional<User> arnold = userRepository.findIdByEmail("liuyengming.tw@gmail.com");
-            walletRepository.save(new Wallet(arnold.get().getId(), CryptoType.USDT, 50000.0));
+            walletRepository.save(new Wallet(arnold.get().getId(), CryptoType.USDT, BigDecimal.valueOf(50000.0)));
             logger.debug("Preloading... Preset Wallet balance 50,000 USDT...");
             userRepository.save(new User("Lloyd Forger", "lforger@gmail.com"));
             Optional<User> lloyd = userRepository.findIdByEmail("lforger@gmail.com");
-            walletRepository.save(new Wallet(lloyd.get().getId(), CryptoType.USDT, 50000.0));
+            walletRepository.save(new Wallet(lloyd.get().getId(), CryptoType.USDT, BigDecimal.valueOf(50000.0)));
             logger.debug("Preloading Done... ");
         };
     }

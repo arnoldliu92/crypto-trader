@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ class WalletServiceTest {
 
     @BeforeEach
     public void setUp() {
-        wallet = new Wallet(1001L, CryptoType.USDT, 100.0);
+        wallet = new Wallet(1001L, CryptoType.USDT, BigDecimal.valueOf(100.0));
     }
 
     @Test
@@ -77,7 +78,7 @@ class WalletServiceTest {
     @Test
     void updateWalletBalance_AddFunds() {
         when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(Optional.of(wallet));
-        walletService.updateWalletBalance(1001L, CryptoType.USDT, 50.0);
+        walletService.updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(50.0));
 
         verify(walletRepository, times(1)).save(wallet);
         assertEquals(150.0, wallet.getBalance());
@@ -86,7 +87,7 @@ class WalletServiceTest {
     @Test
     void updateWalletBalance_DeductFunds() {
         when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(Optional.of(wallet));
-        walletService.updateWalletBalance(1001L, CryptoType.USDT, -50.0);
+        walletService.updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(-50.0));
 
         verify(walletRepository, times(1)).save(wallet);
         assertEquals(50.0, wallet.getBalance());
@@ -96,14 +97,14 @@ class WalletServiceTest {
     void updateWalletBalance_InsufficientFunds() {
         when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.USDT)).thenReturn(Optional.of(wallet));
 
-        assertThrows(InsufficientBalanceException.class, () -> walletService.updateWalletBalance(1001L, CryptoType.USDT, -150.0));
+        assertThrows(InsufficientBalanceException.class, () -> walletService.updateWalletBalance(1001L, CryptoType.USDT, BigDecimal.valueOf(-150.0)));
     }
 
     @Test
     void updateWalletBalance_CreateNewWallet() {
         when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.ETHUSDT)).thenReturn(Optional.empty());
 
-        walletService.updateWalletBalance(1001L, CryptoType.ETHUSDT, 50.0);
+        walletService.updateWalletBalance(1001L, CryptoType.ETHUSDT, BigDecimal.valueOf(50.0));
 
         verify(walletRepository, times(1)).save(any(Wallet.class));
     }
@@ -112,6 +113,6 @@ class WalletServiceTest {
     void updateWalletBalance_CreateNewWalletWithNegativeBalance() {
         when(walletRepository.findByUserIdAndCryptoType(1001L, CryptoType.ETHUSDT)).thenReturn(Optional.empty());
 
-        assertThrows(WalletNotFoundException.class, () -> walletService.updateWalletBalance(1001L, CryptoType.ETHUSDT, -50.0));
+        assertThrows(WalletNotFoundException.class, () -> walletService.updateWalletBalance(1001L, CryptoType.ETHUSDT, BigDecimal.valueOf(-50.0)));
     }
 }

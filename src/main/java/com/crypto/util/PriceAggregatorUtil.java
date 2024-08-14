@@ -79,10 +79,10 @@ public class PriceAggregatorUtil {
     }
 
     /**
-     * Iterate through the full list of Crypto Ticker response gotten from all the cryto source websites
+     * Iterate through the full list of Crypto Ticker response gotten from all the crypto source websites
      *
      * @param cryptoType    Type of crypto interested in finding the best bid or ask price
-     * @param fullList      The full list of Crypto Ticker response gotten from all the cryto source websites,
+     * @param fullList      The full list of Crypto Ticker response gotten from all the crypto source websites,
      *                      the pair also stores the source website as the first element
      * @return              Price[] { bestBidPrice, bestAskPrice }
      */
@@ -122,7 +122,7 @@ public class PriceAggregatorUtil {
             bestBidPrice.setCryptoType(CryptoType.valueOf(ticker.getSymbol()));
             bestBidPrice.setBidPrice(ticker.getBidPrice());
             bestBidPrice.setAskPrice(ticker.getAskPrice());
-        } else if (bestBidPrice.getBidPrice() < ticker.getBidPrice()) {
+        } else if (bestBidPrice.getBidPrice().compareTo(ticker.getBidPrice()) < 0) {
             bestBidPrice.setDataSource(DataSource.valueOf(source));
             bestBidPrice.setBidPrice(ticker.getBidPrice());
         }
@@ -131,7 +131,7 @@ public class PriceAggregatorUtil {
             bestAskPrice.setCryptoType(CryptoType.valueOf(ticker.getSymbol()));
             bestAskPrice.setBidPrice(ticker.getBidPrice());
             bestAskPrice.setAskPrice(ticker.getAskPrice());
-        } else if (bestAskPrice.getAskPrice() > ticker.getAskPrice()) {
+        } else if (bestAskPrice.getAskPrice().compareTo(ticker.getAskPrice()) > 0) {
             bestBidPrice.setDataSource(DataSource.valueOf(source));
             bestBidPrice.setAskPrice(ticker.getAskPrice());
         }

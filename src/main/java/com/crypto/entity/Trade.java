@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -41,17 +42,17 @@ public class Trade {
 
     @NotNull(message = "Price is required")
     @Column(name = "price")
-    private double price;
+    private BigDecimal price;
 
     @NotNull(message = "Amount is required")
     @Column(name = "amount")
-    private double amount;
+    private BigDecimal amount;
 
     @CreationTimestamp
     @Column(name = "timestamp_created")
     private Timestamp timestampCreated;
 
-    public Trade(long userId, TradeType tradeType, CryptoType cryptoType, double price, double amount, Timestamp timestampCreated) {
+    public Trade(long userId, TradeType tradeType, CryptoType cryptoType, BigDecimal price, BigDecimal amount, Timestamp timestampCreated) {
         this.userId = userId;
         this.tradeType = tradeType;
         this.cryptoType = cryptoType;

@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,8 +31,8 @@ class PriceControllerTest {
 
     @Test
     void getLatestBestAggregatedPrice_shouldReturnListOfPrices() {
-        Price btcPrice = new Price(CryptoType.BTCUSDT, 50000.0, 50100.0);
-        Price ethPrice = new Price(CryptoType.ETHUSDT, 3000.0, 3010.0);
+        Price btcPrice = new Price(CryptoType.BTCUSDT, BigDecimal.valueOf(50000.0), BigDecimal.valueOf(50100.0));
+        Price ethPrice = new Price(CryptoType.ETHUSDT, BigDecimal.valueOf(3000.0), BigDecimal.valueOf(3010.0));
         List<Price> expectedPrices = Arrays.asList(btcPrice, ethPrice);
 
         when(priceService.getLatestBestAggregatedPrice()).thenReturn(expectedPrices);

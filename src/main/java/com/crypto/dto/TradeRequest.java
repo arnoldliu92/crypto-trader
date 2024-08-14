@@ -5,10 +5,12 @@ import com.crypto.enums.TradeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 public class TradeRequest {
     private TradeType tradeType;
     private CryptoType cryptoType;
-    private double amount;
+    private BigDecimal amount;
 }

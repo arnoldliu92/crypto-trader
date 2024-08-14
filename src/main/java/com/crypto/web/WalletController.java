@@ -47,7 +47,7 @@ public class WalletController {
      * public ResponseEntity<String> updateWalletBalance(
      *         @PathVariable Long userId,
      *         @RequestParam String cryptoType,
-     *         @RequestParam double amount) {
+     *         @RequestParam BigDecimal amount) {
      *     logger.debug("Updating wallet for {} of type {} by amount {}", userId, cryptoType, amount);
      *     walletService.updateWalletBalance(userId, CryptoType.valueOf(cryptoType), amount);
      *     return ResponseEntity.ok("Wallet balance updated successfully");
