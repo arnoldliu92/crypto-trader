@@ -1,5 +1,6 @@
 package com.crypto.web;
 
+import com.crypto.dto.TradeRequest;
 import com.crypto.entity.Trade;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.TradeType;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,26 +47,16 @@ public class TradeController {
     /**
      *
      * @param userId        User ID
-     * @param tradeType     To determine if it is a BUY or SELL operation
-     * @param cryptoType    To determine the type of currency involved
-     * @param amount        To determine the amount debited or credited
+     * @param tradeRequest  DTO for TradeType, CryptoType, amount
      * @return              Trade object
      */
     @PostMapping
     public ResponseEntity<Trade> executeTrade (
             @RequestHeader Long userId,
-            @RequestHeader TradeType tradeType,
-            @RequestHeader CryptoType cryptoType,
-            @RequestHeader double amount) throws WalletNotFoundException, InsufficientBalanceException {
-        logger.info("Initiating {} trade for {} using {} by {}", tradeType, userId, cryptoType, amount);
-        Trade trade;
-        if (TradeType.BUY.equals(tradeType)) {
-            trade = tradeService.purchaseCrypto(userId, cryptoType, amount);
-        } else if (TradeType.SELL.equals(tradeType)) {
-            trade = tradeService.sellCrypto(userId, cryptoType, amount);
-        } else {
-            throw new InvalidInputException(tradeType);
-        }
+            @RequestBody TradeRequest tradeRequest
+        ) throws WalletNotFoundException, InsufficientBalanceException, InvalidInputException {
+        logger.info("Initiating {} trade for {} using {} by {}", tradeRequest.getTradeType(), userId, tradeRequest.getCryptoType(), tradeRequest.getAmount());
+        Trade trade = tradeService.filterTrade(userId, tradeRequest);
         return ResponseEntity.ok(trade);
     }
 }

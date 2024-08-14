@@ -1,5 +1,6 @@
 package com.crypto.web;
 
+import com.crypto.dto.TradeRequest;
 import com.crypto.entity.Trade;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.TradeType;
@@ -53,24 +54,26 @@ class TradeControllerTest {
 
     @Test
     void executeTrade_purchaseOperationDoneOnce() {
-        when(tradeService.purchaseCrypto(anyLong(), any(CryptoType.class), anyDouble())).thenReturn(trade);
+        when(tradeService.filterTrade(anyLong(), any(TradeRequest.class))).thenReturn(trade);
 
-        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, TradeType.BUY, CryptoType.BTCUSDT, 1.0);
+        TradeRequest actualTradeRequest = new TradeRequest(TradeType.BUY, CryptoType.BTCUSDT, 1.0);
+        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, actualTradeRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trade, response.getBody());
-        verify(tradeService, times(1)).purchaseCrypto(1001L, CryptoType.BTCUSDT, 1.0);
+        verify(tradeService, times(1)).filterTrade(1001L, actualTradeRequest);
     }
 
     @Test
     void executeTrade_sellOperationDoneOnce() {
         trade.setTradeType(TradeType.SELL);
-        when(tradeService.sellCrypto(anyLong(), any(CryptoType.class), anyDouble())).thenReturn(trade);
+        when(tradeService.filterTrade(anyLong(), any(TradeRequest.class))).thenReturn(trade);
 
-        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, TradeType.SELL, CryptoType.BTCUSDT, 1.0);
+        TradeRequest actualTradeRequest = new TradeRequest(TradeType.SELL, CryptoType.BTCUSDT, 1.0);
+        ResponseEntity<Trade> response = tradeController.executeTrade(1001L, actualTradeRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(trade, response.getBody());
-        verify(tradeService, times(1)).sellCrypto(1001L, CryptoType.BTCUSDT, 1.0);
+        verify(tradeService, times(1)).filterTrade(1001L, actualTradeRequest);
     }
 }

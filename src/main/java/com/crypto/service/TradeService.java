@@ -1,16 +1,19 @@
 package com.crypto.service;
 
 import com.crypto.data.TradeRepository;
+import com.crypto.dto.TradeRequest;
 import com.crypto.entity.Price;
 import com.crypto.entity.Trade;
 import com.crypto.enums.CryptoType;
 import com.crypto.enums.TradeType;
 import com.crypto.exception.InsufficientBalanceException;
+import com.crypto.exception.InvalidInputException;
 import com.crypto.exception.WalletNotFoundException;
 import com.crypto.util.SqlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -29,8 +32,21 @@ public class TradeService {
         return tradeRepository.findByUserId(userId);
     }
 
+    public Trade filterTrade(Long userId,
+                             TradeRequest tradeRequest) throws WalletNotFoundException, InsufficientBalanceException, InvalidInputException {
+        Trade trade;
+        if (TradeType.BUY.equals(tradeRequest.getTradeType())) {
+            trade = purchaseCrypto(userId, tradeRequest.getCryptoType(), tradeRequest.getAmount());
+        } else if (TradeType.SELL.equals(tradeRequest.getTradeType())) {
+            trade = sellCrypto(userId, tradeRequest.getCryptoType(), tradeRequest.getAmount());
+        } else {
+            throw new InvalidInputException(tradeRequest.getCryptoType());
+        }
+        return trade;
+    }
+
     @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
-    public Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) {
+    private Trade purchaseCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalCost = latestPrice.getAskPrice() * amount;
 
@@ -44,7 +60,7 @@ public class TradeService {
     }
 
     @Transactional(rollbackFor = {WalletNotFoundException.class, InsufficientBalanceException.class})
-    public Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) {
+    private Trade sellCrypto(Long userId, CryptoType cryptoType, double amount) throws WalletNotFoundException, InsufficientBalanceException {
         Price latestPrice = priceService.getLatestPrice(cryptoType);
         double totalGain = latestPrice.getBidPrice() * amount;
 
